@@ -35,7 +35,7 @@ export default class MomentsController {
   }
 
   public async index() {
-    const moments = await Moment.all()
+    const moments = await Moment.query().preload('comments')
 
     return {
       data: moments,
@@ -63,10 +63,11 @@ export default class MomentsController {
 
   public async update({ params, request }: HttpContextContract) {
     const body = request.body()
-    const moment = await Moment.findOrFail(params)
+    const moment = await Moment.findOrFail(params.id)
 
     moment.title = body.title
-    moment.description = body.description
+    // eslint-disable-next-line no-self-assign
+    moment.description = moment.description
 
     if (moment.image !== body.image || !moment.image) {
       const image = request.file('image', this.validationOptions)
